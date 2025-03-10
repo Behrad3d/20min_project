@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digit Classifier</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6; /* Light gray background */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff; /* White background */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            border: 2px solid #333;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #fileInput {
+            margin: 10px 0;
+        }
+
+        h2 {
+            color: #007bff;
+            font-size: 1.5rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Digit Classifier</h1>
+        <canvas id="canvas" width="280" height="280"></canvas>
+        <br>
+        <button onclick="clearCanvas()">Clear</button>
+        <button onclick="submitCanvas()">Submit</button>
+        <br><br>
+        <input type="file" id="fileInput" accept="image/*">
+        <button onclick="uploadImage()">Upload</button>
+        <h2 id="result"></h2>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set the canvas background to white
+        function initializeCanvas() {
+            ctx.fillStyle = 'white'; // White background
+            ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill the entire canvas with white
+        }
+
+        // Initialize the canvas when the page loads
+        initializeCanvas();
+
+        // Add event listeners for drawing
+        let drawing = false;
+
+        canvas.addEventListener('mousedown', () => {
+            drawing = true;
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+            ctx.beginPath();
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (!drawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = 'black';
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        });
+
+        function clearCanvas() {
+            ctx.fillStyle = 'white'; // Reset background to white
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath(); // Reset the path
+        }
+
+        function submitCanvas() {
+            const dataURL = canvas.toDataURL();
+
+            fetch('/predict', {
+                method: 'POST',
+                body: JSON.stringify({ image: dataURL }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.digit !== undefined) {
+                    document.getElementById('result').innerText = `Predicted Digit: ${data.digit}`;
+                } else {
+                    document.getElementById('result').innerText = 'Error in prediction.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'Error in prediction.';
+            });
+        }
+
+        function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const formData = new FormData();
+
+            if (!fileInput.files[0]) {
+                document.getElementById('result').innerText = 'Please select a file to upload.';
+                return;
+            }
+
+            formData.append('file', fileInput.files[0]);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.digit !== undefined) {
+                    document.getElementById('result').innerText = `Predicted Digit: ${data.digit}`;
+                } else {
+                    document.getElementById('result').innerText = `Error: ${data.error}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'Error in prediction.';
+            });
+        }
+    </script>
+</body>
+</html>
