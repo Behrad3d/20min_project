@@ -1,7 +1,7 @@
 # app.py
 import base64, io, numpy as np
 from PIL import Image, ImageOps
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response,render_template
 import tensorflow as tf
 import os, uuid
 from PIL import Image
@@ -14,86 +14,9 @@ model = tf.keras.models.load_model("mnist_cnn_v2.keras")
 # model = tf.keras.models.load_model("mnist_model.h5")
 
 
-
-HTML = """<!doctype html>
-<html>
-<head>
-<meta charset="utf-8" />
-<title>MNIST Canvas Classifier</title>
-<style>
-  body { font-family: system-ui, sans-serif; display:flex; gap:24px; align-items:flex-start; padding:24px; }
-  #wrap { display:flex; flex-direction:column; gap:12px; }
-  canvas { border:1px solid #ccc; background:#fff; touch-action:none; }
-  button { padding:8px 14px; border-radius:10px; border:1px solid #999; cursor:pointer; }
-  #pred { font-size:20px; }
-  #probs { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space:pre; }
-</style>
-</head>
-<body>
-  <div id="wrap">
-    <canvas id="canvas" width="280" height="280"></canvas>
-    <div>
-      <button id="clear">Clear</button>
-      <button id="predict">Predict</button>
-    </div>
-  </div>
-  <div>
-    <div id="pred">Draw a digit (0–9) and click Predict</div>
-    <pre id="probs"></pre>
-  </div>
-<script>
-const c = document.getElementById('canvas');
-const ctx = c.getContext('2d');
-ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,c.width,c.height);
-ctx.lineWidth = 18; ctx.lineCap = 'round'; ctx.strokeStyle = '#000000';
-
-let drawing = false, last = null;
-
-function pos(e){
-  const r = c.getBoundingClientRect();
-  const x = (e.touches? e.touches[0].clientX : e.clientX) - r.left;
-  const y = (e.touches? e.touches[0].clientY : e.clientY) - r.top;
-  return {x, y};
-}
-function draw(p){
-  if(!last) { last = p; return; }
-  ctx.beginPath();
-  ctx.moveTo(last.x, last.y);
-  ctx.lineTo(p.x, p.y);
-  ctx.stroke();
-  last = p;
-}
-c.addEventListener('mousedown', e=>{ drawing=true; last=null; draw(pos(e)); });
-c.addEventListener('mousemove', e=>{ if(drawing) draw(pos(e)); });
-window.addEventListener('mouseup', ()=> drawing=false);
-
-c.addEventListener('touchstart', e=>{ e.preventDefault(); drawing=true; last=null; draw(pos(e)); });
-c.addEventListener('touchmove',  e=>{ e.preventDefault(); if(drawing) draw(pos(e)); });
-c.addEventListener('touchend',   e=>{ e.preventDefault(); drawing=false; });
-
-document.getElementById('clear').onclick = ()=>{
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,c.width,c.height);
-  document.getElementById('pred').textContent = 'Cleared. Draw a digit and click Predict';
-  document.getElementById('probs').textContent = '';
-};
-
-document.getElementById('predict').onclick = async ()=>{
-  const dataURL = c.toDataURL('image/png');
-  const res = await fetch('/predict', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({image:dataURL}) });
-  const out = await res.json();
-  document.getElementById('pred').textContent = 'Prediction: ' + out.prediction + ' (conf: ' + out.confidence.toFixed(3) + ')';
-  const probs = out.probabilities.map((p,i)=> `${i}: ${p.toFixed(4)}`).join('\\n');
-  document.getElementById('probs').textContent = probs;
-};
-</script>
-</body>
-</html>
-"""
-
 @app.get("/")
 def index():
-    return Response(HTML, mimetype="text/html")
+    return render_template("index.html")
 
 def preprocess_image_from_dataurl(data_url: str) -> np.ndarray:
     # data:image/png;base64,XXXX
