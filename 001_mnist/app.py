@@ -9,9 +9,9 @@ SAVE_DIR = "processed_samples"
 os.makedirs(SAVE_DIR, exist_ok=True) 
 
 app = Flask(__name__)
-# model = tf.keras.models.load_model("mnist_cnn.keras")
-model = tf.keras.models.load_model("mnist_cnn_v2.keras")
-# model = tf.keras.models.load_model("mnist_model.h5")
+# model = tf.keras.models.load_model("mnist_cnn.keras") # Original model we used during the video (not super accurate)
+model = tf.keras.models.load_model("mnist_cnn_v2.keras") #The best outcome 
+# model = tf.keras.models.load_model("mnist_model.h5") # Faster model but not as good as the second one
 
 
 @app.get("/")
