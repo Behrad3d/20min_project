@@ -1,0 +1,4 @@
+processed_samples/*
+*.keras
+*.h5
+.DS_Store
