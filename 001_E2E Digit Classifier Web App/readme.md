@@ -1,6 +1,6 @@
 # Intro
 This is the code associated with my YouTube video on 20 Minutes vibe coding an E2E ML product;
-![youtube](images/mnist_video_preview.png)
+[![youtube](images/mnist_video_preview.png)](https://youtu.be/ibG_bie1OiU)
 
 if you haven't seen the video you can find it [here](https://youtu.be/ibG_bie1OiU)
 
