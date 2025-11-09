@@ -1,15 +1,23 @@
 # Intro
-This is the code associated with my YouTube video on 20 Minutes vibe coding an E2E ML product; if you haven't seen the video you can find it [here]()
+This is the code associated with my YouTube video on 20 Minutes vibe coding an E2E ML product;
+![youtube](images/mnist_video_preview.png)
+
+if you haven't seen the video you can find it [here](https://youtu.be/ibG_bie1OiU)
+
 The end product is a website that would take a drawing from the user and would classify it as a digit between 0 to 9; it is using a model trained in tensorflow, a Python Flask backend and a Javascript based front end; 
 
 ![working app](images/working_app.gif)
 
 # Setup
-1. You'd need to have Python setup then use Pip to install rqeuirements 
+1. You'd need to have Python and virtual Env setup then use Pip to install rqeuirements 
 
-```
-pip install -r requirements.txt
-```
+   - setup the local env
+    ```
+    virtualenv myenv 
+    source myenv/bin/activate
+    pip install -r requirements.txt
+    ```
+    **Note**: you might need to use `pip3` insteald of `pip` 
 
 2. Once done, you can run the flask app using 
 ```
