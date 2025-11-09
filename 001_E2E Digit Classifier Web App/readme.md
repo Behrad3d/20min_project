@@ -39,3 +39,6 @@ by running either using ```python ml.py``` they would train a model using MNIST 
 - To see some of the samples from MNIST dataset you can run `mnist_visualizer.py` it would output a sample of the training dataset in MNIST
 
 ![mnist visualizer](images/mnist_visualizer.png)
+
+
+- Entire ChatGPT conversation is recorded in [this link](https://chatgpt.com/share/6907fe29-86b8-8006-bdea-dd545ed2b401) if you want to explore
