@@ -1,0 +1,3 @@
+[submodule "002_KenKen_Game"]
+	path = 002_KenKen_Game
+	url = ./002_KenKen_Game/.git
